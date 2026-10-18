@@ -710,7 +710,7 @@
             });
         });
 
-        // Muat Data dari localStorage dan Tampilkan di index.html
+        // Sinkronisasi dan Muat Data dari localStorage saat halaman dibuka
         document.addEventListener("DOMContentLoaded", () => {
             loadPublicData();
         });
@@ -718,14 +718,9 @@
         function loadPublicData() {
             const tableBody = document.getElementById('tableBody');
             
-            // Ambil data transaksi dari localStorage (disimpan oleh halaman admin)
             let transactions = JSON.parse(localStorage.getItem('ecobridge_transactions')) || [
-                // Data default awal jika belum ada input dari admin
-                { date: '14 Okt 2026', desc: 'HMPS Pendidikan Matematika - Penyetoran Botol Plastik (45 Kg)', type: 'pemasukan', weight: 45, amount: 270000 },
-                { date: '12 Okt 2026', desc: 'Penyaluran Donasi Tahap VIII - Program Beasiswa BSI Maslahat', type: 'donasi', weight: 0, amount: 850000 },
-                { date: '10 Okt 2026', desc: 'BEM FST - Penyetoran Kardus & Kertas Bekas Acara (110 Kg)', type: 'pemasukan', weight: 110, amount: 550000 },
-                { date: '08 Okt 2026', desc: 'UKM KSR PMI - Hasil Pemilahan Sampah Sekretariat (30 Kg)', type: 'pemasukan', weight: 30, amount: 180000 },
-                { date: '01 Okt 2026', desc: 'Penyaluran Tanggap Bencana & Kesehatan - BSI Maslahat', type: 'donasi', weight: 0, amount: 1200000 }
+                { date: '14 Okt 2026', desc: 'HMPS Pendidikan Matematika - Penyetoran Botol Plastik', type: 'pemasukan', weight: 45, amount: 270000 },
+                { date: '12 Okt 2026', desc: 'Penyaluran Donasi Tahap VIII - Program Beasiswa BSI Maslahat', type: 'donasi', weight: 0, amount: 850000 }
             ];
 
             tableBody.innerHTML = '';
@@ -740,11 +735,11 @@
                 row.setAttribute('data-type', tx.type);
 
                 if (tx.type === 'pemasukan') {
-                    totalWeight += tx.weight;
-                    totalIncome += tx.amount;
+                    totalWeight += Number(tx.weight);
+                    totalIncome += Number(tx.amount);
                     row.innerHTML = `
                         <td class="py-4 px-4 whitespace-nowrap text-xs text-slate-400">${tx.date}</td>
-                        <td class="py-4 px-4 font-medium text-white">${tx.desc}</td>
+                        <td class="py-4 px-4 font-medium text-white">${tx.desc} (${tx.weight} Kg)</td>
                         <td class="py-4 px-4">
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
                                 <i class="fa-solid fa-arrow-down-left text-[10px]"></i> Pemasukan
@@ -753,7 +748,7 @@
                         <td class="py-4 px-4 text-right font-bold text-sky-400">+ Rp ${formattedAmount}</td>
                     `;
                 } else {
-                    totalDonation += tx.amount;
+                    totalDonation += Number(tx.amount);
                     row.innerHTML = `
                         <td class="py-4 px-4 whitespace-nowrap text-xs text-slate-400">${tx.date}</td>
                         <td class="py-4 px-4 font-medium text-white">${tx.desc}</td>
@@ -774,7 +769,7 @@
             document.getElementById('publicTotalDonation').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalDonation);
         }
 
-        // Table Filter Tabs Functionality
+        // Filter Kategori Tabel
         const filterBtns = document.querySelectorAll('.tab-btn');
 
         filterBtns.forEach(btn => {
@@ -799,117 +794,6 @@
                 });
             });
         });
-    <script>
-    // Mobile Menu Toggle
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const menuIcon = document.getElementById('menuIcon');
-    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-
-    mobileMenuBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-        if (mobileMenu.classList.contains('hidden')) {
-            menuIcon.classList.remove('fa-xmark');
-            menuIcon.classList.add('fa-bars');
-        } else {
-            menuIcon.classList.remove('fa-bars');
-            menuIcon.classList.add('fa-xmark');
-        }
-    });
-
-    mobileNavLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
-            menuIcon.classList.remove('fa-xmark');
-            menuIcon.classList.add('fa-bars');
-        });
-    });
-
-    // Sinkronisasi dan Muat Data dari localStorage saat halaman dibuka
-    document.addEventListener("DOMContentLoaded", () => {
-        loadPublicData();
-    });
-
-    function loadPublicData() {
-        const tableBody = document.getElementById('tableBody');
-        
-        // Ambil data dari localStorage
-        let transactions = JSON.parse(localStorage.getItem('ecobridge_transactions')) || [
-            { date: '14 Okt 2026', desc: 'HMPS Pendidikan Matematika - Penyetoran Botol Plastik', type: 'pemasukan', weight: 45, amount: 270000 },
-            { date: '12 Okt 2026', desc: 'Penyaluran Donasi Tahap VIII - Program Beasiswa BSI Maslahat', type: 'donasi', weight: 0, amount: 850000 }
-        ];
-
-        tableBody.innerHTML = '';
-        let totalWeight = 0;
-        let totalIncome = 0;
-        let totalDonation = 0;
-
-        transactions.forEach(tx => {
-            const formattedAmount = new Intl.NumberFormat('id-ID').format(tx.amount);
-            const row = document.createElement('tr');
-            row.className = "table-row hover:bg-slate-700/30 transition-colors";
-            row.setAttribute('data-type', tx.type);
-
-            if (tx.type === 'pemasukan') {
-                totalWeight += Number(tx.weight);
-                totalIncome += Number(tx.amount);
-                row.innerHTML = `
-                    <td class="py-4 px-4 whitespace-nowrap text-xs text-slate-400">${tx.date}</td>
-                    <td class="py-4 px-4 font-medium text-white">${tx.desc} (${tx.weight} Kg)</td>
-                    <td class="py-4 px-4">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                            <i class="fa-solid fa-arrow-down-left text-[10px]"></i> Pemasukan
-                        </span>
-                    </td>
-                    <td class="py-4 px-4 text-right font-bold text-sky-400">+ Rp ${formattedAmount}</td>
-                `;
-            } else {
-                totalDonation += Number(tx.amount);
-                row.innerHTML = `
-                    <td class="py-4 px-4 whitespace-nowrap text-xs text-slate-400">${tx.date}</td>
-                    <td class="py-4 px-4 font-medium text-white">${tx.desc}</td>
-                    <td class="py-4 px-4">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            <i class="fa-solid fa-hand-holding-heart text-[10px]"></i> Donasi Disalurkan
-                        </span>
-                    </td>
-                    <td class="py-4 px-4 text-right font-bold text-emerald-400">- Rp ${formattedAmount}</td>
-                `;
-            }
-            tableBody.appendChild(row);
-        });
-
-        // Perbarui Statistik Widget Publik di index.html
-        document.getElementById('publicTotalWeight').innerText = new Intl.NumberFormat('id-ID').format(totalWeight) + ' Kg';
-        document.getElementById('publicTotalIncome').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalIncome);
-        document.getElementById('publicTotalDonation').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalDonation);
-    }
-
-    // Filter Kategori Tabel (Semua / Pemasukan / Donasi)
-    const filterBtns = document.querySelectorAll('.tab-btn');
-
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterBtns.forEach(b => {
-                b.classList.remove('bg-sky-400', 'text-slate-900', 'font-bold');
-                b.classList.add('text-slate-400', 'hover:text-white');
-            });
-            btn.classList.add('bg-sky-400', 'text-slate-900', 'font-bold');
-            btn.classList.remove('text-slate-400', 'hover:text-white');
-
-            const filterValue = btn.getAttribute('data-filter');
-            const tableRows = document.querySelectorAll('.table-row');
-
-            tableRows.forEach(row => {
-                const rowType = row.getAttribute('data-type');
-                if (filterValue === 'all' || rowType === filterValue) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    });
-</script>
+    </script>
 </body>
 </html>
